@@ -124,8 +124,17 @@ HTMLExtra reports are saved to the ```newman/``` folder by default. To specify a
 | `DELETE` | `/products/:id` | ✅ | Delete a product |
 
 ---
+## Key Testing Principles Demonstrated
 
-### Test Coverage
+- **Happy path + negative testing** for every endpoint
+- **Input boundary validation** (missing fields, whitespace, min-length violations)
+- **Security-first mindset**: injection attacks, JWT tampering, user enumeration prevention
+- **Performance budgets** with explicit SLA assertions (not just console logs)
+- **Test isolation** via dynamic data generation — safe to run repeatedly
+- **Chained state management** — no manual variable setup between requests
+- **Reusable library pattern** for cross-request assertion logic
+
+## Test Coverage
 [Test Coverage Details](./postman/README.md)
 
 ### 🔄 Continuous Integration with GitHub Actions
