@@ -146,10 +146,12 @@ You can find the workflow file here:
 
 
 
-### 👨‍💻 Author
-👤 Tasnim Fariyah
-🔗 [Github](https://github.com/tfariyah31)
-🔗 [LinkedIn](https://www.linkedin.com/in/tasnim-fariyah/)
+### Author
+Tasnim Fariyah
+
+[Github](https://github.com/tfariyah31)
+
+[LinkedIn](https://www.linkedin.com/in/tasnim-fariyah/)
 
 ---
 
