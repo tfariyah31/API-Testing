@@ -142,7 +142,7 @@ You can find the workflow file here:
 
 ### 📊 Newman Report Preview
 
-<img src="newman-report.png" width="600" height="350">
+<img src="Newman_Report.png" width="600" height="350">
 
 
 
