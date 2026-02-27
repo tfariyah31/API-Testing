@@ -64,14 +64,14 @@ jobs:
 
       - name: Run Postman API Tests
         run: |
-          newman run postman-tests/SimpleWebApp_API.json \
-            -e postman-tests/QA_environment.json \
+          newman run postman-tests/full-suite/SimpleWebApp_API.json \
+            -e postman-tests/full-suite/QA_environment.json \
             -r cli,htmlextra \
-            --reporter-htmlextra-export newman/newman-report.html
+            --reporter-htmlextra-export postman-tests/full-suite/newman/newman-report.html
 
       - name: Upload Newman Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: newman-report
-          path: newman/newman-report.html
+          path: postman-tests/full-suite/newman/newman-report.html
