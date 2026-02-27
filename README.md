@@ -188,7 +188,7 @@ HTMLExtra reports are saved to the ```newman/``` folder by default. To specify a
 - **Reusable library pattern** for cross-request assertion logic
 
 ## Test Coverage
-[Test Coverage Details](./postman-tests/full-suite/README.md)
+[Test Coverage Details of Full Suite](./postman-tests/full-suite/README.md)
 
 ### 🔄 Continuous Integration with GitHub Actions
 This project includes a GitHub Actions workflow that:
