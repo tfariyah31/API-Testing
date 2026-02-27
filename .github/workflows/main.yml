@@ -62,6 +62,9 @@ jobs:
       - name: Show environment file
         run: cat postman-tests/QA_environment.json
 
+      - name: Create newman output folder
+        run: mkdir -p postman-tests/full-suite/newman
+
       - name: Run Postman API Tests
         run: |
           newman run postman-tests/full-suite/SimpleWebApp_API.json \
