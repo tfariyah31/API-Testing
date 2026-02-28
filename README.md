@@ -48,8 +48,8 @@ The backend is a simple Node.js + Express app that supports user registration, l
 ##### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/tfariyah31/SimpleWebApp.git
-cd SimpleWebApp
+git clone https://github.com/tfariyah31/API-Testing-Postman.git
+cd API-Testing-Postman
 ```
 
 #### 2. Set Up the Backend
