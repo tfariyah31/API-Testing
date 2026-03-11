@@ -1,0 +1,9 @@
+test_id,test_name,email,password,expected_status,expect_success,error_keyword,extra_check,scenario
+LG-002,Wrong Password,wrong_attempt@test.com,WrongPassword!,401,false,invalid,no_token,wrong_password
+LG-003,Non-existent User,ghost_user_99999@test.com,SomePass123!,401,false,invalid,no_token,nonexistent_user
+LG-004,Case Sensitivity Check,SUPERADMIN@test.com,Str0ng!Pass#2024,200_OR_401_OR_400,false,EMPTY,case_sensitivity,case_check
+LG-005,Blocked User,{{blocked_user}},{{blocked_user_pass}},403,false,blocked,no_token,blocked_user
+LG-006,Missing Email,EMPTY,"Pa$$word123",400,false,required,no_token,missing_email
+LG-007,Missing Password,missing_pass_test@test.com,EMPTY,400,false,required,no_token,missing_password
+LG-008,Empty Credentials,EMPTY,EMPTY,400,false,required,no_token,empty_credentials
+LG-009,Invalid Email Format,notanemail,"Pa$$word123",401,false,invalid,no_token,invalid_email_format

@@ -1,0 +1,353 @@
+{
+  "info": {
+    "_postman_id": "66015e02-5192-4f47-911c-d0dec13466ee",
+    "name": "Data Driven Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "43140997",
+    "_collection_link": "https://go.postman.co/collection/43140997-66015e02-5192-4f47-911c-d0dec13466ee?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "item": [
+        {
+          "name": "Login Validation",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const scenario = pm.iterationData.get('scenario');",
+                  "let email = pm.iterationData.get('email');",
+                  "let password = pm.iterationData.get('password');",
+                  "",
+                  "// Resolve collection var placeholders",
+                  "if (email    === '{{reg_email}}')         email    = pm.collectionVariables.get('reg_email');",
+                  "if (email    === '{{blocked_user}}')      email    = pm.collectionVariables.get('blocked_user');",
+                  "if (password === '{{reg_password}}')      password = pm.collectionVariables.get('reg_password');",
+                  "if (password === '{{blocked_user_pass}}') password = pm.collectionVariables.get('blocked_user_pass');",
+                  "",
+                  "// Rotate email per run for scenarios that repeatedly fail",
+                  "// This avoids hitting the 3-attempt rate limit keyed by email",
+                  "const rotateEmailScenarios = ['wrong_password', 'missing_password'];",
+                  "if (rotateEmailScenarios.includes(scenario)) {",
+                  "    email = `test_${scenario}_${Date.now()}@test.com`;",
+                  "}",
+                  "",
+                  "let body = {};",
+                  "if (email    && email    !== 'EMPTY') body.email    = email;",
+                  "if (password && password !== 'EMPTY') body.password = password;",
+                  "",
+                  "pm.collectionVariables.set('dynamic_body', JSON.stringify(body));",
+                  "console.log(`Running: [${pm.iterationData.get('test_id')}] ${pm.iterationData.get('test_name')} | Body: ${JSON.stringify(body)}`);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response       = pm.response.json();",
+                  "const testId         = pm.iterationData.get('test_id');",
+                  "const testName       = pm.iterationData.get('test_name');",
+                  "const rawStatus      = String(pm.iterationData.get('expected_status')).trim();",
+                  "const expectSuccess  = pm.iterationData.get('expect_success') === 'true';",
+                  "const errorKeyword   = pm.iterationData.get('error_keyword');",
+                  "const extraCheck     = pm.iterationData.get('extra_check');",
+                  "const scenario       = pm.iterationData.get('scenario');",
+                  "",
+                  "// \u2500\u2500 Test 1: Status Code \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+                  "// Handle special case for LG-004 which accepts 200 OR 401",
+                  "if (rawStatus === '200_OR_401') {",
+                  "    pm.test(`[${testId}] ${testName} - Status is 200 or 401 (case sensitivity check)`, () => {",
+                  "        pm.expect(pm.response.code).to.be.oneOf([200, 401]);",
+                  "        const msg = pm.response.code === 200",
+                  "            ? 'INFO: Email login is case-insensitive'",
+                  "            : 'INFO: Email login is case-sensitive';",
+                  "        console.log(msg);",
+                  "    });",
+                  "} else {",
+                  "    const expectedStatus = parseInt(rawStatus, 10);",
+                  "    pm.test(`[${testId}] ${testName} - Status is ${expectedStatus}`, () => {",
+                  "        pm.response.to.have.status(expectedStatus);",
+                  "    });",
+                  "}",
+                  "",
+                  "// \u2500\u2500 Test 2: Success Flag \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+                  "// Skip success flag check for case sensitivity test since it may return 200",
+                  "if (scenario !== 'case_check') {",
+                  "    pm.test(`[${testId}] ${testName} - Success flag is false`, () => {",
+                  "        pm.expect(response.success).to.be.false;",
+                  "    });",
+                  "}",
+                  "",
+                  "// \u2500\u2500 Test 3: Error Keyword \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+                  "if (errorKeyword && errorKeyword !== 'EMPTY' && scenario !== 'case_check') {",
+                  "    pm.test(`[${testId}] ${testName} - Response mentions '${errorKeyword}'`, () => {",
+                  "        const txt = pm.response.text().toLowerCase();",
+                  "        pm.expect(txt).to.include(errorKeyword.toLowerCase());",
+                  "    });",
+                  "}",
+                  "",
+                  "// \u2500\u2500 Test 4: No Token in Response \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+                  "if (extraCheck === 'no_token') {",
+                  "    pm.test(`[${testId}] ${testName} - No accessToken in response`, () => {",
+                  "        pm.expect(response).to.not.have.property('accessToken');",
+                  "    });",
+                  "}",
+                  "",
+                  "// \u2500\u2500 Test 5: User Enumeration Protection (LG-002, LG-003) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+                  "if (scenario === 'wrong_password' || scenario === 'nonexistent_user') {",
+                  "    pm.test(`[${testId}] ${testName} - No user enumeration leak`, () => {",
+                  "        const txt = pm.response.text().toLowerCase();",
+                  "        pm.expect(txt).to.not.include('user not found');",
+                  "        pm.expect(txt).to.not.include('email does not exist');",
+                  "        pm.expect(txt).to.not.include('does not exist');",
+                  "    });",
+                  "}",
+                  "// Add small delay between iterations to space out IP-based rate limiting",
+                  "if (scenario === 'empty_credentials') {",
+                  "    const start = Date.now();",
+                  "    while (Date.now() - start < 1000) {} // 1 second pause",
+                  "}",
+                  "// \u2500\u2500 Test 6: Blocked User Specific Checks (LG-005) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+                  "if (scenario === 'blocked_user') {",
+                  "    pm.test(`[${testId}] ${testName} - Response has required fields`, () => {",
+                  "        pm.expect(response).to.be.an('object');",
+                  "        pm.expect(response).to.have.all.keys('success', 'message');",
+                  "    });",
+                  "    pm.test(`[${testId}] ${testName} - Blocked message is correct`, () => {",
+                  "        pm.expect(response.message).to.include('Your account is blocked. Please contact support.');",
+                  "    });",
+                  "    pm.test(`[${testId}] ${testName} - Success is boolean`, () => {",
+                  "        pm.expect(response.success).to.be.a('boolean');",
+                  "    });",
+                  "    pm.test(`[${testId}] ${testName} - Message is a string`, () => {",
+                  "        pm.expect(response.message).to.be.a('string');",
+                  "    });",
+                  "}",
+                  "",
+                  "// \u2500\u2500 Test 7: Response Time \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+                  "pm.test(`[${testId}] ${testName} - Response time < 2000ms`, () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{dynamic_body}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Registration",
+      "item": [
+        {
+          "name": "Registration Validation",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const email    = pm.iterationData.get('email');",
+                  "const password = pm.iterationData.get('password');",
+                  "const name     = pm.iterationData.get('name');",
+                  "const includeUnknown = pm.iterationData.get('include_unknown_field') === 'true';",
+                  "",
+                  "let body = {};",
+                  "",
+                  "if (email    && email    !== 'EMPTY') body.email    = email;",
+                  "if (password && password !== 'EMPTY') body.password = password;",
+                  "if (name     && name     !== 'EMPTY') body.name     = name;",
+                  "if (includeUnknown) body.unknown = 'Nothing';",
+                  "",
+                  "pm.collectionVariables.set('dynamic_body', JSON.stringify(body));",
+                  "console.log(`Running: ${pm.iterationData.get('test_name')} | Body: ${JSON.stringify(body)}`);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('RAW expected_status:', pm.iterationData.get('expected_status'));",
+                  "console.log('RAW test_id:', pm.iterationData.get('test_id'));",
+                  "console.log('ALL DATA:', JSON.stringify(pm.iterationData.toObject()));",
+                  "",
+                  "",
+                  "const jsonData          = pm.response.json();",
+                  "const expectedStatus = parseInt(String(pm.iterationData.get('expected_status')).trim(), 10);",
+                  "const expectSuccess     = pm.iterationData.get('expect_success') === 'true';",
+                  "const errorKeyword      = pm.iterationData.get('error_keyword');",
+                  "const testName          = pm.iterationData.get('test_name');",
+                  "const testId            = pm.iterationData.get('test_id');",
+                  "",
+                  "console.log('RAW expected_status:', pm.iterationData.get('expected_status'));",
+                  "console.log('RAW test_id:', pm.iterationData.get('test_id'));",
+                  "console.log('ALL DATA:', JSON.stringify(pm.iterationData.toObject()));",
+                  "",
+                  "// Test 1: Status code",
+                  "pm.test(`[${testId}] ${testName} - Status is ${expectedStatus}`, () => {",
+                  "    pm.response.to.have.status(expectedStatus);",
+                  "});",
+                  "",
+                  "// Test 2: Success flag",
+                  "pm.test(`[${testId}] ${testName} - success flag is ${expectSuccess}`, function () {",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "});",
+                  "",
+                  "// Test 3: Error keyword present in response",
+                  "pm.test(`[${testId}] ${testName} - Response mentions '${errorKeyword}'`, () => {",
+                  "    const txt = pm.response.text().toLowerCase();",
+                  "    pm.expect(txt).to.include(errorKeyword.toLowerCase());",
+                  "});",
+                  "",
+                  "// Test 4: No user data leaked",
+                  "pm.test(`[${testId}] ${testName} - No user data in error response`, function () {",
+                  "    pm.expect(jsonData.id).to.be.undefined;",
+                  "    pm.expect(jsonData.email).to.be.undefined;",
+                  "    pm.expect(jsonData.password).to.be.undefined;",
+                  "});",
+                  "",
+                  "// Test 5: Response time",
+                  "pm.test(`[${testId}] ${testName} - Response time < 2000ms`, () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{dynamic_body}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "reg_email",
+      "value": "validation@test.com"
+    },
+    {
+      "key": "reg_password",
+      "value": "Str0ng!Pass#2024"
+    },
+    {
+      "key": "reg_saved_email",
+      "value": "ValidationPass123!"
+    },
+    {
+      "key": "dynamic_body",
+      "value": "{}"
+    },
+    {
+      "key": "base_url",
+      "value": "http://localhost:5001/api"
+    },
+    {
+      "key": "blocked_user",
+      "value": "blocked@test.com"
+    },
+    {
+      "key": "blocked_user_pass",
+      "value": "BlockedPass123!"
+    }
+  ]
+}

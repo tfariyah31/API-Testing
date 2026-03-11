@@ -1,0 +1,11 @@
+test_id,test_name,email,password,name,include_unknown_field,expected_status,expect_success,error_keyword,scenario
+REG-003,Invalid Email Format,not-an-email,Str0ng!Pass,ValidUser,false,400,false,email,invalid_email
+REG-004,Weak Password,weak@test.com,123,ValidUser,false,400,false,password,weak_password
+REG-005,Missing Multiple Required Fields,missing@test.com,,,false,400,false,required,missing_fields
+REG-006,Missing Email Field,,Str0ng!Pass#2024,TestUser,false,400,false,email,missing_email
+REG-007,Missing Password Field,missingPass@test.com,,TestUser,false,400,false,password,missing_password
+REG-008,Missing Name Field,missingName@test.com,Str0ng!Pass#2024,,false,400,false,name,missing_name
+REG-009,Empty Body Request,EMPTY,EMPTY,EMPTY,false,400,false,required,empty_body
+REG-010,Unknown Field,unknown@test.com,Str0ng!Pass#2024,TestUser,true,400,false,unknown,unknown_field
+REG-011,Whitespace Only Email,   ,Str0ng!Pass#2024,TestUser,false,400,false,email,whitespace_email
+REG-012,Password Below Min Length,below@testing.com,Pa$$,TestUser,false,400,false,password,short_password
