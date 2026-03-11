@@ -8,25 +8,39 @@ This project demonstrates API testing using **Postman**, **Newman**, and **GitHu
 ## Project Structure
 ```
 Postman-API-Testing-Demo/
+│
 ├── backend/
-│   └── Node.js backend app
+│   └── Node.js backend application
+│
 ├── postman-tests/
-│   └── full-suite/
-│       └── SimpleWebApp_API.json
-│       └── QA_environment.json
-│       └── README.md
-│       └── newman/
-│           └── SimpleWebApp API.html
-│   └── rate-limit/
-│       └── RateLimit_SimpleWebApp_API.json
-│       └── README.md
-│       └── newman/
-│           └── Iteration SimpleWebApp.html    
+│
+│   ├── full-suite/
+│   │   ├── SimpleWebApp_API.json
+│   │   ├── QA_environment.json
+│   │   ├── README.md
+│   │   └── newman/
+│   │       └── SimpleWebApp_API_Report.html
+│
+│   ├── rate-limit/
+│   │   ├── RateLimit_SimpleWebApp_API.json
+│   │   ├── README.md
+│   │   └── newman/
+│   │       └── RateLimit_Test_Report.html
+│
+│   ├── data-driven-tests/
+│   │   ├── Data_Driven_Collection.json
+│   │   ├── login_validation_data.csv
+│   │   ├── registration_data.csv
+│   │   ├── README.md
+│   │   └── newman/
+│   │       ├── Login_Tests_Report.html
+│   │       └── Registration_Tests_Report.html
+│
 ├── .github/
 │   └── workflows/
-│       └── api-tests.yml 
-├── README.md
-
+│       └── api-tests.yml
+│
+└── README.md
 ```
 
 
@@ -102,7 +116,9 @@ node seeProducts.js
 | Collection | Description |
 |------------|-------------|
 | Full Suite | Functional, security & performance tests. - View Details Below |
-| Rate Limit | Brute-force & iteration tests - [View Details Here](postman-tests/rate-limit/README.md) |
+| Rate Limit | Brute-force & iteration tests - [View Details Here](postman-tests/data-driven/README.md) |
+| Data Driven | Validation tests - [View Details Here](postman-tests/data-driven/README.md) |
+
 
 ### Import the Collection
 
